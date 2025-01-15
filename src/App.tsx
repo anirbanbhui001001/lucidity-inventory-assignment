@@ -1,29 +1,18 @@
-import {
-  Screen,
-  NavBar,
-  Card,
-  Title,
-  Form,
-  Footer,
-  Default,
-} from "./components/React";
+import * as React from "react";
+import { Routes, Route } from "react-router-dom";
+import AdminView from "./views/AdminView";
+import UserView from "./views/UserView";
+import NavigationBar from "./components/NavigationBar";
 
-function App() {
+export default function App() {
   return (
-    <>
-      <NavBar />
-      <Screen>
-        <Card>
-          <Default />
-        </Card>
-        <Card>
-          <Title text={"Example UI Kit"} />
-          <Form />
-        </Card>
-      </Screen>
-      <Footer />
-    </>
+    <div className="min-h-screen bg-gray-900">
+      <NavigationBar />
+      <Routes>
+        <Route path="/admin" element={<AdminView />} />
+        <Route path="/user" element={<UserView />} />
+        <Route path="*" element={<div>404: Page not found</div>} />
+      </Routes>
+    </div>
   );
 }
-
-export default App;
