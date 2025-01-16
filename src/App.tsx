@@ -6,12 +6,16 @@ import NavigationBar from "./components/NavigationBar";
 
 export default function App() {
   return (
-    <div className="min-h-screen bg-gray-900">
+    <div className="min-h-screen bg-gray-900 min-w-[600px]">
       <NavigationBar />
       <Routes>
+        <Route path="/" element={<AdminView />} />
         <Route path="/admin" element={<AdminView />} />
         <Route path="/user" element={<UserView />} />
-        <Route path="*" element={<div>404: Page not found</div>} />
+        <Route
+          path="*"
+          element={<div className="text-white">404: Page not found</div>}
+        />
       </Routes>
     </div>
   );

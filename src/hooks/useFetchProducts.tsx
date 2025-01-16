@@ -1,44 +1,67 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
-import { generateUniqueId } from "../utils"; // Import the helper function
+import {
+  fetchProductsStart,
+  fetchProductsSuccess,
+  fetchProductsFailure,
+  updateProduct,
+} from "../actions/productActions";
+import { RootState } from "../store";
+import { Product } from "../lib/types";
+import { generateUniqueId } from "../utils";
+
+// Shared variable to store data and track fetch status
+let fetchedProducts: Product[] | null = null;
+let isFetching = false;
 
 const useFetchProducts = () => {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const dispatch = useDispatch();
 
-  // Fetch the products initially
+  const products = useSelector((state: RootState) => state.product.products);
+  const loading = useSelector((state: RootState) => state.product.loading);
+  const error = useSelector((state: RootState) => state.product.error);
+
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await axios.get(
-          "https://dev-0tf0hinghgjl39z.api.raw-labs.com/inventory"
-        );
+    if (products.length > 0) {
+      return; // No need to fetch again
+    }
 
-        // Add unique id to each product
-        const productsWithIds = response.data.map((product) => ({
-          ...product,
-          id: generateUniqueId(),
-        }));
+    if (fetchedProducts) {
+      // If products are already fetched, directly dispatch success
+      dispatch(fetchProductsSuccess(fetchedProducts));
+      return;
+    }
 
-        setProducts(productsWithIds);
-      } catch (error) {
-        setError(error);
-        console.error("Error fetching products:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+    if (!isFetching) {
+      isFetching = true; // Mark as fetching to prevent duplicate requests
+      dispatch(fetchProductsStart());
 
-    fetchProducts();
-  }, []);
+      axios
+        .get("https://dev-0tf0hinghgjl39z.api.raw-labs.com/inventory")
+        .then((response) => {
+          const productsWithIds = response.data.map((product: Product) => ({
+            ...product,
+            id: generateUniqueId(),
+          }));
 
-  // Method to update a specific product in the list
-  const updateProduct = (updatedProduct) => {
-    setProducts(updatedProduct);
+          fetchedProducts = productsWithIds; // Cache the result
+          dispatch(fetchProductsSuccess(productsWithIds));
+        })
+        .catch((err) => {
+          dispatch(fetchProductsFailure(err));
+        })
+        .finally(() => {
+          isFetching = false; // Reset fetching status
+        });
+    }
+  }, [dispatch]);
+
+  const updateProductList = (updatedProduct: Product[]) => {
+    dispatch(updateProduct(updatedProduct));
   };
 
-  return { products, loading, error, updateProduct };
+  return { products, loading, error, updateProductList };
 };
 
 export default useFetchProducts;

@@ -9,12 +9,16 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@reduxjs/toolkit": "2.5.0",
     "antd": "5.23.1",
     "axios": "1.7.9",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-feather": "^2.0.10",
-    "react-router-dom": "7.1.1"
+    "react-redux": "9.2.0",
+    "react-router-dom": "7.1.1",
+    "redux": "5.0.1",
+    "redux-thunk": "3.1.0"
   },
   "devDependencies": {
     "@types/react": "^18.0.15",
